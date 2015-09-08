@@ -1,0 +1,119 @@
+apply plugin: 'java'
+apply plugin: 'maven'
+apply plugin: 'signing'
+
+
+project.version = "0.1.0"
+project.group = "io.github.jimmyhmiller"
+
+
+
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main
+}
+
+
+artifacts {
+    archives sourcesJar
+}
+
+signing {
+    sign configurations.archives
+}
+
+
+
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                authentication(userName: ossrhUsername, password: ossrhPassword)
+            }
+
+            snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+                authentication(userName: ossrhUsername, password: ossrhPassword)
+            }
+
+            pom.project {
+                name 'JsonTransformer'
+                packaging 'jar'
+                // optionally artifactId can be defined here
+                description 'A library for transforming json in Java 8'
+                url 'http://github.com/jimmyhmiller/json-transformer'
+
+                scm {
+                    connection 'scm:svn:http://foo.googlecode.com/svn/trunk/'
+                    developerConnection 'scm:svn:https://foo.googlecode.com/svn/trunk/'
+                    url 'http://foo.googlecode.com/svn/trunk/'
+                }
+
+                licenses {
+                    license {
+                        name 'The Apache License, Version 2.0'
+                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id 'manfred'
+                        name 'Manfred Moser'
+                        email 'manfred@sonatype.com'
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+repositories {
+    mavenCentral()
+}
+
+configurations {
+    markdownDoclet
+}
+
+
+test {
+    testLogging {
+        events "passed", "skipped", "failed", "standardOut", "standardError"
+    }
+    dependsOn 'cleanTest'
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir "json"
+        }
+    }
+    test {
+        java {
+            srcDir "json"
+        }
+    }
+}
+
+dependencies {
+    compile 'org.glassfish:javax.json:1.0.4'
+    compile 'ch.qos.logback:logback-core:1.1.3'
+    compile 'ch.qos.logback:logback-classic:1.1.3'
+    markdownDoclet 'ch.raffael.pegdown-doclet:pegdown-doclet:1.1.1'
+    testCompile 'junit:junit:4.12'
+    testCompile 'com.pholser:junit-quickcheck-core:0.5-alpha-4'
+    testCompile 'com.pholser:junit-quickcheck-generators:0.5-alpha-4'
+}
+
+javadoc.options {
+    docletpath = configurations.markdownDoclet.files.asType(List)
+    doclet = "ch.raffael.doclets.pegdown.PegdownDoclet"
+    addStringOption("parse-timeout", "10")
+}
+
+
