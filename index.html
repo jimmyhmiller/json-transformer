@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title>Json Transformer by jimmyhmiller</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+  </head>
+  <body>
+    <section class="page-header">
+      <h1 class="project-name">Json Transformer</h1>
+      <h2 class="project-tagline">A functional way to transform json in Java 8</h2>
+      <a href="https://github.com/jimmyhmiller/json-transformer" class="btn">View on GitHub</a>
+      <a href="https://github.com/jimmyhmiller/json-transformer/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/jimmyhmiller/json-transformer/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
+
+    <section class="main-content">
+      <h1>
+<a id="json-transformer" class="anchor" href="#json-transformer" aria-hidden="true"><span class="octicon octicon-link"></span></a>Json Transformer</h1>
+
+<p>A clean functional way to transform json in Java 8.</p>
+
+<div class="highlight highlight-java"><pre><span class="pl-smi">JsonValue</span> json <span class="pl-k">=</span> <span class="pl-smi">Json</span><span class="pl-k">.</span>createObjectBuilder()
+        .add(<span class="pl-s"><span class="pl-pds">"</span>test<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>change me<span class="pl-pds">"</span></span>)
+        .add(<span class="pl-s"><span class="pl-pds">"</span>add2<span class="pl-pds">"</span></span>, <span class="pl-c1">3</span>)
+        .add(<span class="pl-s"><span class="pl-pds">"</span>add2ToAll<span class="pl-pds">"</span></span>, <span class="pl-smi">Json</span><span class="pl-k">.</span>createArrayBuilder()<span class="pl-k">.</span>add(<span class="pl-c1">2</span>)<span class="pl-k">.</span>add(<span class="pl-c1">3</span>)<span class="pl-k">.</span>add(<span class="pl-c1">4</span>))
+        .add(<span class="pl-s"><span class="pl-pds">"</span>nested<span class="pl-pds">"</span></span>, <span class="pl-smi">Json</span><span class="pl-k">.</span>createObjectBuilder()
+            .add(<span class="pl-s"><span class="pl-pds">"</span>test2<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>change me<span class="pl-pds">"</span></span>))
+        .build();
+
+<span class="pl-smi">JsonValue</span> transformed <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-smi">JsonTransformer</span>(json)
+        .mapRIf((<span class="pl-smi">String</span> s) <span class="pl-k">-</span><span class="pl-k">&gt;</span> s<span class="pl-k">.</span>equals(<span class="pl-s"><span class="pl-pds">"</span>change me<span class="pl-pds">"</span></span>), (<span class="pl-smi">String</span> s) <span class="pl-k">-</span><span class="pl-k">&gt;</span> <span class="pl-s"><span class="pl-pds">"</span>changed<span class="pl-pds">"</span></span>)
+        .mapIf((<span class="pl-smi">String</span> key, <span class="pl-smi">Integer</span> i) <span class="pl-k">-</span><span class="pl-k">&gt;</span> key<span class="pl-k">.</span>equals(<span class="pl-s"><span class="pl-pds">"</span>add2<span class="pl-pds">"</span></span>), (<span class="pl-smi">String</span> key, <span class="pl-smi">Integer</span> i) <span class="pl-k">-</span><span class="pl-k">&gt;</span> i <span class="pl-k">+</span> <span class="pl-c1">2</span>)
+        .mapR((<span class="pl-smi">JsonArray</span> a) <span class="pl-k">-</span><span class="pl-k">&gt;</span> <span class="pl-k">new</span> <span class="pl-smi">JsonTransformer</span>(a)<span class="pl-k">.</span>map((<span class="pl-smi">Integer</span> i) <span class="pl-k">-</span><span class="pl-k">&gt;</span> i <span class="pl-k">+</span> <span class="pl-c1">2</span>)<span class="pl-k">.</span>toJson())
+        .pprint()
+        .toJson();
+
+<span class="pl-c">/* console output</span>
+<span class="pl-c">{</span>
+<span class="pl-c">    "test":"changed",</span>
+<span class="pl-c">    "add2":5,</span>
+<span class="pl-c">    "add2ToAll":[</span>
+<span class="pl-c">        4,</span>
+<span class="pl-c">        5,</span>
+<span class="pl-c">        6</span>
+<span class="pl-c">    ],</span>
+<span class="pl-c">    "nested":{</span>
+<span class="pl-c">        "test2":"changed"</span>
+<span class="pl-c">    }</span>
+<span class="pl-c">}</span>
+<span class="pl-c">*/</span></pre></div>
+
+<h2>
+<a id="installation" class="anchor" href="#installation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Installation</h2>
+
+<p>Currently in the process of adding this to maven central.</p>
+
+<h2>
+<a id="motivation" class="anchor" href="#motivation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Motivation</h2>
+
+<p>Performing transformations to json as json in java is typically a pain. Lot's of type checking and casting typically occurs. No libraries have builtin support for structural recursion. Code becomes increasingly imperative. </p>
+
+<p>JsonTransformer let's you simple declare your transformation using Map and MapRecursive. It also gets rid of (hides) all the type conversion you need to do by simply allowing you to specify your type in the lambda expression. </p>
+
+<h2>
+<a id="limitations" class="anchor" href="#limitations" aria-hidden="true"><span class="octicon octicon-link"></span></a>Limitations</h2>
+
+<p>JsonTransformer is still in the earlier stages and as such is not feature complete nor provides rich documentation. But what has been released is a useable core. Currently map is the only function type offered. Filter, remove, and possibly reduce are planned, though what their behavior out to be exactly still needs to be figured out.</p>
+
+<p>Type information is a little wonky when writing your lambdas. This is due to a required work around for Java's "same erasure" issue. You will notice types like "FunctionFromStringToObject", this quite literally means, "Function&lt;String, Object&gt;" but we need this dummy value in order to appease Java. This means also that you must specify your types explicitly in your lambdas.</p>
+
+<h2>
+<a id="planned-features" class="anchor" href="#planned-features" aria-hidden="true"><span class="octicon octicon-link"></span></a>Planned Features</h2>
+
+<ul>
+<li>Add filter and filterRecursive</li>
+<li>Add reduce and reduceRecursive</li>
+<li>Add full JavaDoc</li>
+<li>Add transform (this will be a method that takes another json transformer)</li>
+<li>Add more complete testing suite</li>
+</ul>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/jimmyhmiller/json-transformer">Json Transformer</a> is maintained by <a href="https://github.com/jimmyhmiller">jimmyhmiller</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
+
+    </section>
+
+  
+  </body>
+</html>
