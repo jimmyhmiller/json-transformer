@@ -3,20 +3,20 @@
 A clean functional way to transform json in Java 8.
 
 ```java
-    JsonValue json = Json.createObjectBuilder()
-            .add("test", "change me")
-            .add("add2", 3)
-            .add("add2ToAll", Json.createArrayBuilder().add(2).add(3).add(4))
-            .add("nested", Json.createObjectBuilder()
-                .add("test2", "change me"))
-            .build();
+JsonValue json = Json.createObjectBuilder()
+        .add("test", "change me")
+        .add("add2", 3)
+        .add("add2ToAll", Json.createArrayBuilder().add(2).add(3).add(4))
+        .add("nested", Json.createObjectBuilder()
+            .add("test2", "change me"))
+        .build();
 
-    JsonValue transformed = new JsonTransformer(json)
-            .mapRIf((String s) -> s.equals("change me"), (String s) -> "changed")
-            .mapIf((String key, Integer i) -> key.equals("add2"), (String key, Integer i) -> i + 2)
-            .mapR((JsonArray a) -> new JsonTransformer(a).map((Integer i) -> i + 2).toJson())
-            .pprint()
-            .toJson();
+JsonValue transformed = new JsonTransformer(json)
+        .mapRIf((String s) -> s.equals("change me"), (String s) -> "changed")
+        .mapIf((String key, Integer i) -> key.equals("add2"), (String key, Integer i) -> i + 2)
+        .mapR((JsonArray a) -> new JsonTransformer(a).map((Integer i) -> i + 2).toJson())
+        .pprint()
+        .toJson();
  
 /* console output
 {
