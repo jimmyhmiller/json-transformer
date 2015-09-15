@@ -1,4 +1,4 @@
-package json;
+package io.github.jimmyhmiller;
 
 
 import javax.json.*;

@@ -3,72 +3,80 @@ apply plugin: 'maven'
 apply plugin: 'signing'
 
 
-project.version = "0.1.0"
-project.group = "io.github.jimmyhmiller"
+archivesBaseName = "json-transformer"
+version = "0.1.0"
+group = "io.github.jimmyhmiller"
 
 
 
-task sourcesJar(type: Jar) {
-    classifier = 'sources'
-    from sourceSets.main
+configurations {
+    deployerJars
 }
 
 
+task javadocJar(type: Jar) {
+    classifier = 'javadoc'
+    from javadoc
+}
+
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
 artifacts {
-    archives sourcesJar
+    archives javadocJar, sourcesJar
+}
+
+dependencies {
+    deployerJars "org.apache.maven.wagon:wagon-http:2.2"
 }
 
 signing {
     sign configurations.archives
 }
 
+println ossrhUsername
 
 
+ uploadArchives {
+     repositories {
+         mavenDeployer {
+             beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+             configuration = configurations.deployerJars
+             repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2") {
+                 authentication(userName: ossrhUsername, password: ossrhPassword)
+             }
 
-uploadArchives {
-    repositories {
-        mavenDeployer {
-            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+             snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+                 authentication(userName: ossrhUsername, password: ossrhPassword)
+             }
 
-            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-                authentication(userName: ossrhUsername, password: ossrhPassword)
-            }
+             pom.project {
+                 name 'JsonTransformer'
+                 packaging 'jar'
+                 description 'A library for transforming json in Java 8'
+                 url 'http://github.com/jimmyhmiller/json-transformer'
 
-            snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-                authentication(userName: ossrhUsername, password: ossrhPassword)
-            }
 
-            pom.project {
-                name 'JsonTransformer'
-                packaging 'jar'
-                // optionally artifactId can be defined here
-                description 'A library for transforming json in Java 8'
-                url 'http://github.com/jimmyhmiller/json-transformer'
+                 licenses {
+                     license {
+                         name 'The MIT License (MIT)'
+                         url 'https://opensource.org/licenses/MIT'
+                     }
+                 }
 
-                scm {
-                    connection 'scm:svn:http://foo.googlecode.com/svn/trunk/'
-                    developerConnection 'scm:svn:https://foo.googlecode.com/svn/trunk/'
-                    url 'http://foo.googlecode.com/svn/trunk/'
-                }
-
-                licenses {
-                    license {
-                        name 'The Apache License, Version 2.0'
-                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                    }
-                }
-
-                developers {
-                    developer {
-                        id 'manfred'
-                        name 'Manfred Moser'
-                        email 'manfred@sonatype.com'
-                    }
-                }
-            }
-        }
-    }
-}
+                 developers {
+                     developer {
+                         id 'jimmyhmiller'
+                         name 'Jimmy Miller'
+                         email 'jimmyhmiller@gmail.com'
+                     }
+                 }
+             }
+         }
+     }
+ }
 
 
 repositories {
@@ -87,18 +95,6 @@ test {
     dependsOn 'cleanTest'
 }
 
-sourceSets {
-    main {
-        java {
-            srcDir "json"
-        }
-    }
-    test {
-        java {
-            srcDir "json"
-        }
-    }
-}
 
 dependencies {
     compile 'org.glassfish:javax.json:1.0.4'
