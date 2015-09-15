@@ -4,7 +4,7 @@ apply plugin: 'signing'
 
 
 archivesBaseName = "json-transformer"
-version = "0.1.0"
+version = "0.1.0-SNAPSHOT"
 group = "io.github.jimmyhmiller"
 
 

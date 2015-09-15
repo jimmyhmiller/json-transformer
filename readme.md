@@ -35,8 +35,22 @@ JsonValue transformed = new JsonTransformer(json)
 ```
 
 ##Installation
+Add the following to your build.gradle
+```groovy
+repositories {
+    mavenCentral()
+    maven {
+        url "https://oss.sonatype.org/content/repositories/snapshots/"
+    }
 
-Currently in the process of adding this to maven central.
+}
+
+dependencies {
+    compile 'io.github.jimmyhmiller:json-transformer:0.1.0-SNAPSHOT'
+    compile 'org.glassfish:javax.json:1.0.4'
+}
+```
+
 
 
 ##Motivation
