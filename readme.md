@@ -47,7 +47,6 @@ repositories {
 
 dependencies {
     compile 'io.github.jimmyhmiller:json-transformer:0.1.0-SNAPSHOT'
-    compile 'org.glassfish:javax.json:1.0.4'
 }
 ```
 
