@@ -1,6 +1,6 @@
 #Json Transformer
 
-A clean functional way to transform json in Java 8.
+A clean functional way to transform JSON in Java 8.
 
 ```java
 JsonValue json = Json.createObjectBuilder()
@@ -53,19 +53,19 @@ dependencies {
 
 
 ##Motivation
-Performing transformations to json as json in java is typically a pain. Lot's of type checking and casting typically occurs. No libraries have builtin support for structural recursion. Code becomes increasingly imperative. 
+Performing transformations to JSON as JSON in Java is typically a pain. Lots of type checking and casting typically occurs. No libraries have builtin support for structural recursion. Code becomes increasingly imperative. 
 
-JsonTransformer let's you simple declare your transformation using Map and MapRecursive. It also gets rid of (hides) all the type conversion you need to do by simply allowing you to specify your type in the lambda expression. 
+JsonTransformer lets you simple declare your transformation using Map and MapRecursive. It also gets rid of (hides) all the type conversion you need to do by simply allowing you to specify your type in the lambda expression. 
 
 ##Limitations
 JsonTransformer is still in the earlier stages and as such is not feature complete nor provides rich documentation. But what has been released is a useable core. Currently map is the only function type offered. Filter, remove, and possibly reduce are planned, though what their behavior out to be exactly still needs to be figured out.
 
-Type information is a little wonky when writing your lambdas. This is due to a required work around for Java's "same erasure" issue. You will notice types like "FunctionFromStringToObject", this quite literally means, "Function\<String, Object\>" but we need this dummy value in order to appease Java. This means also that you must specify your types explicitly in your lambdas.
+Type information is a little wonky when writing your lambdas. This is due to a required work around for Java's "same erasure" issue. You will notice types like "FunctionFromStringToObject", this quite literally means, "Function<String, Object>" but we need this dummy value in order to appease Java. This means also that you must specify your types explicitly in your lambdas.
 
 ##Planned Features
 
 * Add filter and filterRecursive
 * Add reduce and reduceRecursive
 * Add full JavaDoc
-* Add transform (this will be a method that takes another json transformer)
+* Add transform (this will be a method that takes another JSON transformer)
 * Add more complete testing suite
